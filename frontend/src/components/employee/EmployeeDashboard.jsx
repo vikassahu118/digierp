@@ -132,9 +132,13 @@ const EmployeeDashboard = () => {
                                     <span>To-Do List</span>
                                 </Link>
                             </li>
-                            <li>
+                           <li>
                                 <button
-                                    onClick={handleLogout}
+                                    onClick={() => {
+                                        if (window.confirm("Are you sure you want to logout?")) {
+                                            handleLogout();
+                                        }
+                                    }}
                                     className="flex items-center gap-3 p-2 w-full text-left rounded-lg hover:bg-red-600 transition"
                                 >
                                     <LogOut size={18} />
@@ -191,5 +195,6 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
+
 
 
