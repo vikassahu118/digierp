@@ -165,7 +165,7 @@ const Attendance = () => {
   );
 
   return (
-    <div className="p-4 md:p-6 space-y-6  text-white h-full w-full">
+    <div className="p-4 md:p-6 space-y-6  text-white w-full pb-8">
       
       
       {/* Header + Buttons */}
@@ -360,3 +360,4 @@ const Attendance = () => {
 };
 
 export default Attendance;
+
