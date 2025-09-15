@@ -77,13 +77,7 @@ const EmployeeDashboard = () => {
                             alt="Digiwing ERP"
                             className="h-13 w-13" />
 
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="md:hidden text-gray-400 hover:text-white"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
+                      
 
                     {/* sidebar nenu */}
                     <div className="flex-1 p-4 overflow-y-auto">
@@ -197,3 +191,4 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
+
