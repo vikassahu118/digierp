@@ -157,7 +157,7 @@ const EmployeeDashboard = () => {
                     {/* mobile */}
                     <button
                         onClick={() => setIsOpen(!isOpen)}
-                        className="md:hidden p-2 text-white bg-gray-900 rounded-md"
+                        className="md:hidden fixed top-5 right-4 z-50 p-2 text-white bg-gray-900 rounded-md"
                     >
                         {isOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -191,4 +191,5 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
+
 
