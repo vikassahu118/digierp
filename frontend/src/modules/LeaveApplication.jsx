@@ -17,13 +17,13 @@ const LeaveApplication = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-800">
-            <div className="bg-gray-500 p-6 max-w-lg mx-auto space-y-6">
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="bg-white/15 backdrop-blur-md rounded-xl shadow-lg border border-white/40 p-6 max-w-lg mx-auto space-y-6">
                 <h2 className="text-2xl font-bold text-white">Apply for Leave</h2>
 
                 <form
                     onSubmit={handleSubmit}
-                    className="bg-gray-800 p-6 rounded-lg shadow space-y-4"
+                    className=" p-6 rounded-lg shadow space-y-4"
                 >
                     <div>
                         <label className="block text-gray-300 mb-2">Reason</label>
