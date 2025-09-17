@@ -32,7 +32,7 @@ const Attendance = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://192.168.1.17:3000/api/attendance/me?from=2025-09-01&to=2025-09-30",
+        "http://192.168.1.13:3000/api/attendance/me?from=2025-09-01&to=2025-09-30",
         {
           headers: {
             "Content-Type": "application/json",
@@ -87,13 +87,13 @@ const Attendance = () => {
         status === "Present"
           ? "check-in"
           : status === "Check-Out"
-          ? "check-out"
-          : null;
+            ? "check-out"
+            : null;
 
       if (!endpoint) return;
 
       const response = await fetch(
-        `http://192.168.1.17:3000/api/attendance/${endpoint}`,
+        `http://192.168.1.13:3000/api/attendance/${endpoint}`,
         {
           method: "POST",
           headers: {
@@ -165,9 +165,9 @@ const Attendance = () => {
   );
 
   return (
-    <div className="p-4 md:p-6 space-y-6  text-white w-full pb-8">
-      
-      
+    <div className="p-4 md:p-6 space-y-6  text-white  w-full pb-8">
+
+
       {/* Header + Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -193,11 +193,10 @@ const Attendance = () => {
             disabled={
               hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn
             }
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn
+            className={`px-4 py-2 rounded-lg font-semibold transition ${hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-green-600 hover:bg-green-700"
-            }`}
+              }`}
           >
             {isProcessing && !hasCheckedInToday && !didCheckIn
               ? "Processing..."
@@ -214,20 +213,19 @@ const Attendance = () => {
               isProcessing ||
               didCheckOut
             }
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              !hasCheckedInToday ||
-              hasCheckedOutToday ||
-              hasLeaveToday ||
-              isProcessing ||
-              didCheckOut
+            className={`px-4 py-2 rounded-lg font-semibold transition ${!hasCheckedInToday ||
+                hasCheckedOutToday ||
+                hasLeaveToday ||
+                isProcessing ||
+                didCheckOut
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              }`}
           >
             {isProcessing &&
-            hasCheckedInToday &&
-            !hasCheckedOutToday &&
-            !didCheckOut
+              hasCheckedInToday &&
+              !hasCheckedOutToday &&
+              !didCheckOut
               ? "Processing..."
               : "Check-Out"}
           </button>
@@ -236,11 +234,10 @@ const Attendance = () => {
           <button
             onClick={() => markAttendance("Leave")}
             disabled={hasCheckedInToday || hasCheckedOutToday || isProcessing}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${
-              hasCheckedInToday || hasCheckedOutToday || isProcessing
+            className={`px-4 py-2 rounded-lg font-semibold transition ${hasCheckedInToday || hasCheckedOutToday || isProcessing
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-yellow-500 hover:bg-yellow-600"
-            }`}
+              }`}
           >
             Leave
           </button>
@@ -296,15 +293,14 @@ const Attendance = () => {
             return (
               <div
                 key={i}
-                className={`p-2 rounded-lg ${
-                  record?.check_in_at
+                className={`p-2 rounded-lg ${record?.check_in_at
                     ? !record.check_out_at
                       ? "bg-green-600"
                       : "bg-blue-600"
                     : record?.status?.includes("Leave")
-                    ? "bg-yellow-500"
-                    : "bg-gray-700 text-gray-300"
-                }`}
+                      ? "bg-yellow-500"
+                      : "bg-gray-700 text-gray-300"
+                  }`}
               >
                 {i + 1}
               </div>
@@ -314,7 +310,7 @@ const Attendance = () => {
       </div>
 
       {/* Detailed Report */}
-      <div className="bg-black/15 backdrop-blur-md border border-white/40 p-6 rounded-lg shadow overflow-x-auto">
+      <div className="bg-black/15 backdrop-blur-md border border-white/40 p-6 rounded-lg shadow overflow-x-auto mb-6">
         <h3 className="text-lg font-semibold mb-4">Detailed Report</h3>
         <table className="w-full text-left border-collapse min-w-[500px]">
           <thead>
@@ -332,32 +328,31 @@ const Attendance = () => {
                 <td className="p-2">{formatTime(a.check_in_at)}</td>
                 <td className="p-2">{formatTime(a.check_out_at)}</td>
                 <td
-                  className={`p-2 ${
-                    a.status === "Leave"
+                  className={`p-2 ${a.status === "Leave"
                       ? "text-yellow-400"
                       : a.check_out_at
-                      ? "text-blue-400"
-                      : a.check_in_at
-                      ? "text-green-400"
-                      : "text-gray-400"
-                  }`}
+                        ? "text-blue-400"
+                        : a.check_in_at
+                          ? "text-green-400"
+                          : "text-gray-400"
+                    }`}
                 >
                   {a.status === "Leave"
                     ? "Leave"
                     : a.check_out_at
-                    ? "Check-Out"
-                    : a.check_in_at
-                    ? "Present"
-                    : "-"}
+                      ? "Check-Out"
+                      : a.check_in_at
+                        ? "Present"
+                        : "-"}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
     </div>
   );
 };
 
 export default Attendance;
-
