@@ -68,7 +68,7 @@ const EmployeeDashboard = () => {
                     } md:translate-x-0 transition-transform duration-300 ease-in-out w-64 z-50`}
             >
                 <div
-                    className="bg-white/15 backdrop-blur-md border border-white/15 
+                    className="bg-black/30 backdrop-blur-md border border-white/15 
                 rounded-r-md shadow-lg h-full"
                 >
                     {/* digilogo */}
@@ -240,3 +240,4 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
+
