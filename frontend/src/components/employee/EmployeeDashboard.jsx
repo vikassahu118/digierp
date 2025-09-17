@@ -17,6 +17,7 @@ import Attendance from "../../modules/Attendance";
 import Projects from "../../modules/Projects";
 import Performance from "../../modules/Performance";
 import Todo from "../../modules/Todo";
+import LeaveApprovalPage from "../../modules/LeaveApprovalPage";
 
 const EmployeeDashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -63,9 +64,8 @@ const EmployeeDashboard = () => {
         <div className="flex min-h-screen">
             {/* sidebar */}
             <div
-                className={`fixed left-0 h-screen text-white transform ${
-                    isOpen ? "translate-x-0" : "-translate-x-full"
-                } md:translate-x-0 transition-transform duration-300 ease-in-out w-64 z-50`}
+                className={`fixed left-0 h-screen text-white transform ${isOpen ? "translate-x-0" : "-translate-x-full"
+                    } md:translate-x-0 transition-transform duration-300 ease-in-out w-64 z-50`}
             >
                 <div
                     className="bg-white/15 backdrop-blur-md border border-white/15 
@@ -97,16 +97,37 @@ const EmployeeDashboard = () => {
                                 </li>
                             )}
 
-                            <li>
-                                <Link
-                                    to="/employee-dashboard/attendance"
-                                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
-                                    onClick={() => setIsOpen(false)}
-                                >
-                                    <CalendarCheck size={18} />
-                                    <span>Attendance</span>
-                                </Link>
-                            </li>
+
+
+                            {(user.role === "HR" || user.role === "EMPLOYEE") && (
+                                <li>
+                                    <Link
+                                        to="/employee-dashboard/attendance"
+                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <CalendarCheck size={18} />
+                                        <span>Attendance</span>
+                                    </Link>
+                                </li>
+                            )}
+
+
+
+                            {/*leave aPPROVAL FOR ADMIN AND HR */}
+                            {(user.role === "ADMIN" || user.role === "HR") && (
+                                <li>
+                                    <Link
+                                        to="/employee-dashboard/leaveapprovalpage"
+                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <CalendarCheck size={18} />
+                                        <span>Leave Approval</span>
+                                    </Link>
+                                </li>
+                            )}
+
                             <li>
                                 <Link
                                     to="/employee-dashboard/projects"
@@ -190,10 +211,23 @@ const EmployeeDashboard = () => {
                         {user.role === "ADMIN" && (
                             <Route index element={<DashboardHome />} />
                         )}
-                        <Route path="attendance" element={<Attendance />} />
+
+
+                        {(user.role === "HR" || user.role === "EMPLOYEE") && (
+                            <Route path="attendance" element={<Attendance />} />
+                        )}
+
+
                         <Route path="projects" element={<Projects />} />
                         <Route path="performance" element={<Performance />} />
                         <Route path="todo" element={<Todo />} />
+
+
+                        {(user.role === "ADMIN" || user.role === "HR") && (
+                            <Route path="leaveapprovalpage" element={<LeaveApprovalPage />} />
+                        )}
+
+
                         <Route
                             path="*"
                             element={<Navigate to="/employee-dashboard" replace />}
