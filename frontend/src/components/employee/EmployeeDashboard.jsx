@@ -10,6 +10,7 @@ import {
     LogOut,
     Menu,
     X,
+    CreditCard,
 } from "lucide-react";
 
 import DashboardHome from "../../modules/DashboardHome";
@@ -18,6 +19,7 @@ import Projects from "../../modules/Projects";
 import Performance from "../../modules/Performance";
 import Todo from "../../modules/Todo";
 import LeaveApprovalPage from "../../modules/LeaveApprovalPage";
+import FinancialDashboard from "../../modules/FinancialReports";
 
 const EmployeeDashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -28,7 +30,7 @@ const EmployeeDashboard = () => {
         const fetchUserData = async () => {
             const token = localStorage.getItem("token");
             if (!token) {
-                navigate("/employee");
+                navigate("/"); // Redirect to the main login page
                 return;
             }
 
@@ -97,8 +99,7 @@ const EmployeeDashboard = () => {
                                 </li>
                             )}
 
-
-
+                            {/* Attendance */}
                             {(user.role === "HR" || user.role === "EMPLOYEE") && (
                                 <li>
                                     <Link
@@ -112,9 +113,7 @@ const EmployeeDashboard = () => {
                                 </li>
                             )}
 
-
-
-                            {/*leave aPPROVAL FOR ADMIN AND HR */}
+                            {/* Leave Approval */}
                             {(user.role === "ADMIN" || user.role === "HR") && (
                                 <li>
                                     <Link
@@ -128,6 +127,21 @@ const EmployeeDashboard = () => {
                                 </li>
                             )}
 
+                            {/* Financial */}
+                            {(user.role === "ADMIN" || user.role === "HR") && (
+                                <li>
+                                    <Link
+                                        to="/employee-dashboard/FinancialDashboard"
+                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <CreditCard size={18} /> {/* Add the icon here */}
+                                        <span>Financial</span>
+                                    </Link>
+                                </li>
+                            )}
+
+                            {/* Projects */}
                             <li>
                                 <Link
                                     to="/employee-dashboard/projects"
@@ -138,6 +152,8 @@ const EmployeeDashboard = () => {
                                     <span>Projects</span>
                                 </Link>
                             </li>
+
+                            {/* Performance */}
                             <li>
                                 <Link
                                     to="/employee-dashboard/performance"
@@ -148,6 +164,8 @@ const EmployeeDashboard = () => {
                                     <span>Performance</span>
                                 </Link>
                             </li>
+
+                            {/* To-Do List */}
                             <li>
                                 <Link
                                     to="/employee-dashboard/todo"
@@ -158,6 +176,8 @@ const EmployeeDashboard = () => {
                                     <span>To-Do List</span>
                                 </Link>
                             </li>
+
+                            {/* Logout */}
                             <li>
                                 <button
                                     onClick={() => {
@@ -207,31 +227,25 @@ const EmployeeDashboard = () => {
                 {/* modules */}
                 <div className="p-0 text-gray-900 overflow-y-auto flex-1 scrollbar-hide">
                     <Routes>
-                        {/* Only admins can access DashboardHome */}
-                        {user.role === "ADMIN" && (
+                        {/* Conditional Index Route */}
+                        {user.role === "ADMIN" ? (
                             <Route index element={<DashboardHome />} />
+                        ) : (
+                            <Route index element={<Attendance />} />
                         )}
 
-
-                        {(user.role === "HR" || user.role === "EMPLOYEE") && (
-                            <Route path="attendance" element={<Attendance />} />
-                        )}
-
-
+                        <Route path="attendance" element={<Attendance />} />
                         <Route path="projects" element={<Projects />} />
                         <Route path="performance" element={<Performance />} />
                         <Route path="todo" element={<Todo />} />
-
 
                         {(user.role === "ADMIN" || user.role === "HR") && (
                             <Route path="leaveapprovalpage" element={<LeaveApprovalPage />} />
                         )}
 
-
-                        <Route
-                            path="*"
-                            element={<Navigate to="/employee-dashboard" replace />}
-                        />
+                        {(user.role === "ADMIN" || user.role === "HR") && (
+                            <Route path="FinancialDashboard" element={<FinancialDashboard />} />
+                        )}
                     </Routes>
                 </div>
             </div>
@@ -240,4 +254,3 @@ const EmployeeDashboard = () => {
 };
 
 export default EmployeeDashboard;
-
