@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate,Link } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import digilogo from "../../assets/images/digilogo.svg";
 import employeelogo from "../../assets/images/employeelogo.svg";
 import bg from "../../assets/images/bg.jpg";
@@ -53,10 +53,11 @@ const LoginPage = () => {
             login(data);
 
             // Role-based redirection logic based on the data received
-            if (data.role === "admin") {
-                navigate("/employee-dashboard/admin"); // Admin dashboard route
+            if (data.role === "ADMIN") {
+                navigate("/employee-dashboard"); // Admin dashboard route
             } else {
-                navigate("/employee-dashboard/attendance"); // Default user route
+                // Correct redirection for employees to the attendance page
+                navigate("/employee-dashboard/attendance"); 
             }
         } catch (err) {
             console.error("Login error:", err);
@@ -133,7 +134,6 @@ const LoginPage = () => {
                             <Link to="/forgot-password" className="text-blue-500 hover:underline">
                                 Forgot password?
                             </Link>
-
                         </div>
 
                         {/* Submit button */}
