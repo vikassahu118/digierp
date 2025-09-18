@@ -1,21 +1,32 @@
-import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const ResetPassword = () => {
-  const { token } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+ 
+  const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const BACKEND_URL = "http://192.168.1.13:3000/api/auth/reset-password";
+  // The backend route is /api/reset-password/:token, so we append the token here.
+  const BACKEND_URL = `http://192.168.1.13:3000/api/auth/reset-password/${token}`;
+
+  useEffect(() => {
+    // We only need the token to be present for the reset to be valid.
+    if (!token) {
+      setMessage("Invalid password reset link. Token is missing.");
+    }
+  }, [token]);
 
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      setMessage("Passwords do not match.");
+      setMessage("❌ Passwords do not match.");
       return;
     }
 
@@ -26,24 +37,24 @@ const ResetPassword = () => {
       const response = await fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
+        body: JSON.stringify({ password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) throw new Error(data.error || "Reset failed");
 
-      setMessage("Password reset successful! Redirecting to login...");
-      setTimeout(() => navigate("/"), 2000); // redirect after 2s
+      setMessage("✅ Password reset successful! Redirecting to login...");
+      setTimeout(() => navigate("/"), 2000); 
     } catch (err) {
-      setMessage(err.message);
+      setMessage(`❌ ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center ">
+    <div className="min-h-screen flex items-center justify-center">
       <div className="w-full max-w-md bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-lg">
         <h2 className="text-2xl font-bold text-white text-center mb-6">
           Create New Password
@@ -57,8 +68,8 @@ const ResetPassword = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
               placeholder="Enter new password"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -71,16 +82,24 @@ const ResetPassword = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
               placeholder="Confirm new password"
+              className="w-full p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {message && <p className="text-center text-sm text-red-400">{message}</p>}
+          {message && (
+            <p
+              className={`text-center text-sm ${
+                message.startsWith("✅") ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {message}
+            </p>
+          )}
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || !token}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:bg-blue-400"
           >
             {loading ? "Updating..." : "Reset Password"}
