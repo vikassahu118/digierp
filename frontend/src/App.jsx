@@ -8,6 +8,7 @@ import LeaveApplication from "./modules/LeaveApplication";
 import bg from "../../frontend/src/assets/images/bg.jpg";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword"; 
+import FinancialDashboard from "./modules/FinancialReports";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -33,7 +34,7 @@ const App = () => {
           <Route path="/" element={<EmployeeLoginPage />} />
           <Route path="/admin" element={<AdminLoginPage />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} /> 
+          <Route path="/reset-password" element={<ResetPassword />} /> 
 
           {/* Protected Routes */}
           <Route
@@ -41,6 +42,14 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <EmployeeDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/financialdashboard/*"
+            element={
+              <ProtectedRoute>
+                < FinancialDashboard/>
               </ProtectedRoute>
             }
           />
