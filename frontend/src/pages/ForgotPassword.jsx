@@ -5,6 +5,7 @@ const ForgotPassword = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // The updated URL now matches the backend route
   const BACKEND_URL = "http://192.168.1.13:3000/api/auth/forgot-password";
 
   const handleSubmit = async (e) => {
@@ -21,9 +22,10 @@ const ForgotPassword = () => {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || "Something went wrong");
+      if (!res.ok) throw new Error(data.message || "Something went wrong");
 
       setMessage("✅ Check your email for reset instructions.");
+      setEmail(""); // clear the email field
     } catch (err) {
       setMessage(`❌ ${err.message}`);
     } finally {
@@ -52,7 +54,13 @@ const ForgotPassword = () => {
           </div>
 
           {message && (
-            <p className="text-sm text-center text-blue-400">{message}</p>
+            <p
+              className={`text-sm text-center ${
+                message.startsWith("✅") ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {message}
+            </p>
           )}
 
           <button
