@@ -5,7 +5,12 @@ const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
- 
+  // The backend expects the token in the URL path, not as a query parameter.
+  // The correct link format for your backend is something like:
+  // https://your-frontend-app.com/reset-password/YOUR_TOKEN
+  // However, since the provided code uses useSearchParams, we will assume
+  // the URL is structured like this: /reset-password?token=YOUR_TOKEN
+  // We'll proceed with this assumption and correct the API call below.
   const token = searchParams.get("token");
 
   const [password, setPassword] = useState("");
@@ -14,7 +19,7 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
 
   // The backend route is /api/reset-password/:token, so we append the token here.
-  const BACKEND_URL = `http://192.168.1.13:3000/api/auth/reset-password/${token}`;
+  const BACKEND_URL = `http://localhost:3000/api/auth/reset-password/${token}`;
 
   useEffect(() => {
     // We only need the token to be present for the reset to be valid.
