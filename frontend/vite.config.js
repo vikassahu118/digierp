@@ -4,9 +4,9 @@ import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
 
 export default defineConfig({
-//  server: {
-//    allowedHosts: ['vikas.com']
-//  },
+  server: {
+    allowedHosts: ['vikas.com']
+  },
   plugins: [react()],
   css: {
     postcss: {
