@@ -11,6 +11,8 @@ import {
     Menu,
     X,
     CreditCard,
+    User,
+    CalendarCheck2,
 } from "lucide-react";
 
 import DashboardHome from "../../modules/DashboardHome";
@@ -20,6 +22,7 @@ import Performance from "../../modules/Performance";
 import Todo from "../../modules/Todo";
 import LeaveApprovalPage from "../../modules/LeaveApprovalPage";
 import FinancialDashboard from "../../modules/FinancialReports";
+import MonthSummary from "../../modules/attendance/MonthSummary";
 
 const EmployeeDashboard = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +38,7 @@ const EmployeeDashboard = () => {
             }
 
             try {
-                const response = await fetch("http://192.168.1.13:3000/api/me", {
+                const response = await fetch("http://localhost:3000/api/me", {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -93,8 +96,8 @@ const EmployeeDashboard = () => {
                                         className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
                                         onClick={() => setIsOpen(false)}
                                     >
-                                        <Home size={18} />
-                                        <span>Dashboard</span>
+                                        <User size={18} />
+                                        <span>Employee Management</span>
                                     </Link>
                                 </li>
                             )}
@@ -137,6 +140,21 @@ const EmployeeDashboard = () => {
                                     >
                                         <CreditCard size={18} /> {/* Add the icon here */}
                                         <span>Financial</span>
+                                    </Link>
+                                </li>
+                            )}
+
+
+                            {/* Attendance summary */}
+                             {(user.role === "ADMIN" || user.role === "HR") && (
+                                <li>
+                                    <Link
+                                        to="/employee-dashboard/MonthSummary"
+                                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-700 transition"
+                                        onClick={() => setIsOpen(false)}
+                                    >
+                                        <CalendarCheck2 size={18} /> {/* Add the icon here */}
+                                        <span>Attendance Summary</span>
                                     </Link>
                                 </li>
                             )}
@@ -245,6 +263,11 @@ const EmployeeDashboard = () => {
 
                         {(user.role === "ADMIN" || user.role === "HR") && (
                             <Route path="FinancialDashboard" element={<FinancialDashboard />} />
+                        )}
+
+                    
+                        {(user.role === "ADMIN" || user.role === "HR") && (
+                            <Route path="MonthSummary" element={<MonthSummary />} />
                         )}
                     </Routes>
                 </div>
