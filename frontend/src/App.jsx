@@ -9,6 +9,7 @@ import bg from "../../frontend/src/assets/images/bg.jpg";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword"; 
 import FinancialDashboard from "./modules/FinancialReports";
+import MonthSummary from "./modules/attendance/MonthSummary";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -61,6 +62,16 @@ const App = () => {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/monthsummary"
+            element={
+              <ProtectedRoute>
+                <MonthSummary />
+              </ProtectedRoute>
+            }
+          />
+          
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
