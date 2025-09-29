@@ -25,7 +25,7 @@ const LeaveApplication = () => {
             const token = localStorage.getItem("token"); 
 
             const res = await axios.post(
-                "http://192.168.1.13:3000/api/leaves/apply",
+                "http://localhost:3000/api/leaves/apply",
                 formData,
                 {
                     headers: {
