@@ -13,7 +13,7 @@ const LeaveApprovalPage = () => {
   const fetchLeaves = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("http://192.168.1.13:3000/api/leaves/admin", {
+      const res = await axios.get("http://localhost:3000/api/leaves/admin", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setLeaves(res.data);
@@ -29,7 +29,7 @@ const LeaveApprovalPage = () => {
   const handleAction = async (id, status) => {
     try {
       await axios.put(
-        `http://192.168.1.13:3000/api/leaves/admin/${id}/status`,
+        `http://localhost:3000/api/leaves/admin/${id}/status`,
         { status },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -81,7 +81,7 @@ const LeaveApprovalPage = () => {
                 <td className="border p-2 text-white">
                   {leave.document_path ? (
                     <a
-                      href={`http://192.168.1.13:3000/${leave.document_path}`}
+                      href={`http://localhost:3000/${leave.document_path}`}
                       target="_blank"
                       rel="noreferrer"
                       className="text-blue-600 underline"
