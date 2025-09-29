@@ -14,12 +14,13 @@ const Attendance = () => {
   const navigate = useNavigate();
   const today = new Date().toISOString().split("T")[0];
 
+  // 🔹 Update current time every second
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
-  // 🔹 Reset lock states every new day
+  // 🔹 Reset daily lock states
   useEffect(() => {
     setDidCheckIn(false);
     setDidCheckOut(false);
@@ -32,7 +33,7 @@ const Attendance = () => {
       if (!token) return;
 
       const response = await fetch(
-        "http://192.168.1.13:3000/api/attendance/me?from=2025-09-01&to=2025-09-30",
+        "http://localhost:3000/api/attendance/me?from=2025-09-01&to=2025-09-30",
         {
           headers: {
             "Content-Type": "application/json",
@@ -56,15 +57,11 @@ const Attendance = () => {
     fetchAttendance();
   }, []);
 
-  // 🔹 Format time safely
+  // 🔹 Format time
   const formatTime = (iso) => {
     if (!iso) return "";
     const date = new Date(iso);
-    return date.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    });
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true });
   };
 
   // 🔹 Mark attendance
@@ -87,13 +84,12 @@ const Attendance = () => {
         status === "Present"
           ? "check-in"
           : status === "Check-Out"
-            ? "check-out"
-            : null;
-
+          ? "check-out"
+          : null;
       if (!endpoint) return;
 
       const response = await fetch(
-        `http://192.168.1.13:3000/api/attendance/${endpoint}`,
+        `http://localhost:3000/api/attendance/${endpoint}`,
         {
           method: "POST",
           headers: {
@@ -106,37 +102,26 @@ const Attendance = () => {
       if (response.ok) {
         const nowIso = new Date().toISOString();
 
-        // 🔹 Optimistic updates
         if (status === "Present") {
-          setAttendance((prev) => [
-            ...prev,
-            { check_in_at: nowIso, check_out_at: null, status: "Present" },
-          ]);
+          setAttendance((prev) => [...prev, { check_in_at: nowIso, check_out_at: null, status: "Present" }]);
           setDidCheckIn(true);
         }
 
         if (status === "Check-Out") {
           setAttendance((prev) =>
             prev.map((a) =>
-              a.check_in_at?.startsWith(today)
-                ? { ...a, check_out_at: nowIso }
-                : a
+              a.check_in_at?.startsWith(today) ? { ...a, check_out_at: nowIso } : a
             )
           );
           setDidCheckOut(true);
         }
 
-        // Still fetch fresh data
         await fetchAttendance();
 
         const now = new Date();
         setLastAction({
           status,
-          time: now.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-            hour12: true,
-          }),
+          time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: true }),
         });
       } else {
         const errorData = await response.json();
@@ -153,91 +138,76 @@ const Attendance = () => {
     }
   };
 
-  // 🔹 Status check helpers based on backend fields
-  const hasCheckedInToday = attendance.some(
-    (a) => a.check_in_at && a.check_in_at.startsWith(today)
-  );
-  const hasCheckedOutToday = attendance.some(
-    (a) => a.check_out_at && a.check_out_at.startsWith(today)
-  );
-  const hasLeaveToday = attendance.some(
-    (a) => a.status?.includes("Leave") && a.check_in_at?.startsWith(today)
-  );
+  // 🔹 Status helpers
+  const hasCheckedInToday = attendance.some(a => a.check_in_at?.startsWith(today));
+  const hasCheckedOutToday = attendance.some(a => a.check_out_at?.startsWith(today));
+  const hasLeaveToday = attendance.some(a => a.status?.includes("Leave") && a.check_in_at?.startsWith(today));
+
+  // 🔹 Check-In time window: before 10:15 AM or 1:45 PM–2:00 PM
+  const isWithinCheckInWindow = () => {
+    const h = currentTime.getHours();
+    const m = currentTime.getMinutes();
+    if (h < 10 || (h === 10 && m <= 15)) return true; // morning
+    if ((h === 13 && m >= 45) || (h === 14 && m === 0)) return true; // afternoon
+    return false;
+  };
+
+  // 🔹 Check-In message
+  let checkInMessage = "";
+  const totalMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  if (totalMinutes <= 615) checkInMessage = "✅ Check-In available until 10:15 AM";
+  else if (totalMinutes > 615 && totalMinutes < 825) checkInMessage = "⏳ Check-In closed, reopens at 1:45 PM";
+  else if (totalMinutes >= 825 && totalMinutes <= 840) checkInMessage = "✅ Check-In available until 2:00 PM";
+  else checkInMessage = "❌ Check-In closed for today";
 
   return (
-    <div className="p-4 md:p-6 space-y-6  text-white  w-full pb-8">
-
-
+    <div className="p-4 md:p-6 space-y-6 text-white w-full pb-8">
       {/* Header + Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <p className="text-sm text-gray-300">
-            {currentTime.toLocaleDateString("en-GB", {
-              weekday: "long",
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            })}
+            {currentTime.toLocaleDateString("en-GB", { weekday: "long", day: "2-digit", month: "short", year: "numeric" })}
           </p>
-          <p className="text-base sm:text-lg md:text-xl font-semibold">
-            {currentTime.toLocaleTimeString()}
-          </p>
+          <p className="text-base sm:text-lg md:text-xl font-semibold">{currentTime.toLocaleTimeString()}</p>
         </div>
-        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center">
-          Attendance
-        </h2>
+        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center">Attendance</h2>
         <div className="flex flex-wrap gap-2 justify-center sm:justify-end">
           {/* ✅ Check-In */}
-          <button
-            onClick={() => markAttendance("Present")}
-            disabled={
-              hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn
-            }
-            className={`px-4 py-2 rounded-lg font-semibold transition ${hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
+          <div className="flex flex-col items-center">
+            <button
+              onClick={() => markAttendance("Present")}
+              disabled={hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn || !isWithinCheckInWindow()}
+              className={`px-4 py-2 rounded-lg font-semibold transition ${
+                hasCheckedInToday || hasLeaveToday || isProcessing || didCheckIn || !isWithinCheckInWindow()
+                  ? "bg-gray-500 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
               }`}
-          >
-            {isProcessing && !hasCheckedInToday && !didCheckIn
-              ? "Processing..."
-              : "Check In"}
-          </button>
+            >
+              {isProcessing && !hasCheckedInToday && !didCheckIn ? "Processing..." : "Check In"}
+            </button>
+            <p className="text-xs mt-1 text-gray-300">{checkInMessage}</p>
+          </div>
 
           {/* ✅ Check-Out */}
           <button
             onClick={() => markAttendance("Check-Out")}
-            disabled={
-              !hasCheckedInToday ||
-              hasCheckedOutToday ||
-              hasLeaveToday ||
-              isProcessing ||
-              didCheckOut
-            }
-            className={`px-4 py-2 rounded-lg font-semibold transition ${!hasCheckedInToday ||
-                hasCheckedOutToday ||
-                hasLeaveToday ||
-                isProcessing ||
-                didCheckOut
+            disabled={!hasCheckedInToday || hasCheckedOutToday || hasLeaveToday || isProcessing || didCheckOut}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              !hasCheckedInToday || hasCheckedOutToday || hasLeaveToday || isProcessing || didCheckOut
                 ? "bg-gray-500 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700"
-              }`}
+            }`}
           >
-            {isProcessing &&
-              hasCheckedInToday &&
-              !hasCheckedOutToday &&
-              !didCheckOut
-              ? "Processing..."
-              : "Check-Out"}
+            {isProcessing && hasCheckedInToday && !hasCheckedOutToday && !didCheckOut ? "Processing..." : "Check-Out"}
           </button>
 
           {/* Leave */}
           <button
             onClick={() => markAttendance("Leave")}
             disabled={hasCheckedInToday || hasCheckedOutToday || isProcessing}
-            className={`px-4 py-2 rounded-lg font-semibold transition ${hasCheckedInToday || hasCheckedOutToday || isProcessing
-                ? "bg-gray-500 cursor-not-allowed"
-                : "bg-yellow-500 hover:bg-yellow-600"
-              }`}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${
+              hasCheckedInToday || hasCheckedOutToday || isProcessing ? "bg-gray-500 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+            }`}
           >
             Leave
           </button>
@@ -262,45 +232,38 @@ const Attendance = () => {
         </div>
         <div className="bg-black/15 backdrop-blur-md border border-white/40 p-4 rounded-lg shadow text-center">
           <p className="text-gray-400">Present</p>
-          <h3 className="text-xl font-bold text-green-400">
-            {attendance.filter((a) => a.check_in_at).length}
-          </h3>
+          <h3 className="text-xl font-bold text-green-400">{attendance.filter(a => a.check_in_at).length}</h3>
         </div>
         <div className="bg-black/15 backdrop-blur-md border border-white/40 p-4 rounded-lg shadow text-center">
           <p className="text-gray-400">Leave</p>
-          <h3 className="text-xl font-bold text-yellow-400">
-            {attendance.filter((a) => a.status?.includes("Leave")).length}
-          </h3>
+          <h3 className="text-xl font-bold text-yellow-400">{attendance.filter(a => a.status?.includes("Leave")).length}</h3>
         </div>
         <div className="bg-black/15 backdrop-blur-md border border-white/40 p-4 rounded-lg shadow text-center">
           <p className="text-gray-400">Check-Outs</p>
-          <h3 className="text-xl font-bold text-blue-400">
-            {attendance.filter((a) => a.check_out_at).length}
-          </h3>
+          <h3 className="text-xl font-bold text-blue-400">{attendance.filter(a => a.check_out_at).length}</h3>
         </div>
       </div>
 
-      {/* calendar  */}
+      {/* Calendar */}
       <div className="bg-black/15 backdrop-blur-md border border-white/40 p-6 rounded-lg shadow overflow-x-auto">
         <h3 className="text-lg font-semibold mb-4">September 2025 Report</h3>
         <div className="grid grid-cols-7 gap-2 text-center text-sm sm:text-base min-w-[420px]">
           {Array.from({ length: 30 }).map((_, i) => {
             const day = String(i + 1).padStart(2, "0");
             const date = `2025-09-${day}`;
-            const record = attendance.find((a) =>
-              a.check_in_at?.startsWith(date)
-            );
+            const record = attendance.find(a => a.check_in_at?.startsWith(date));
             return (
               <div
                 key={i}
-                className={`p-2 rounded-lg ${record?.check_in_at
+                className={`p-2 rounded-lg ${
+                  record?.check_in_at
                     ? !record.check_out_at
                       ? "bg-green-600"
                       : "bg-blue-600"
                     : record?.status?.includes("Leave")
-                      ? "bg-yellow-500"
-                      : "bg-gray-700 text-gray-300"
-                  }`}
+                    ? "bg-yellow-500"
+                    : "bg-gray-700 text-gray-300"
+                }`}
               >
                 {i + 1}
               </div>
@@ -327,30 +290,28 @@ const Attendance = () => {
                 <td className="p-2">{a.check_in_at?.split("T")[0]}</td>
                 <td className="p-2">{formatTime(a.check_in_at)}</td>
                 <td className="p-2">{formatTime(a.check_out_at)}</td>
-                <td
-                  className={`p-2 ${a.status === "Leave"
-                      ? "text-yellow-400"
-                      : a.check_out_at
-                        ? "text-blue-400"
-                        : a.check_in_at
-                          ? "text-green-400"
-                          : "text-gray-400"
-                    }`}
-                >
+                <td className={`p-2 ${
+                  a.status === "Leave"
+                    ? "text-yellow-400"
+                    : a.check_out_at
+                    ? "text-blue-400"
+                    : a.check_in_at
+                    ? "text-green-400"
+                    : "text-gray-400"
+                }`}>
                   {a.status === "Leave"
                     ? "Leave"
                     : a.check_out_at
-                      ? "Check-Out"
-                      : a.check_in_at
-                        ? "Present"
-                        : "-"}
+                    ? "Check-Out"
+                    : a.check_in_at
+                    ? "Present"
+                    : "-"}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
     </div>
   );
 };
