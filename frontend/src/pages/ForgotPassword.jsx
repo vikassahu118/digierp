@@ -6,7 +6,7 @@ const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
 
   // The updated URL now matches the backend route
-  const BACKEND_URL = "http://192.168.1.13:3000/api/auth/forgot-password";
+  const BACKEND_URL = "http://localhost:3000/api/auth/forgot-password";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
